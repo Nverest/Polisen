@@ -1,101 +1,178 @@
-﻿using System.Runtime.InteropServices;
-using System.Runtime.Intrinsics.Arm;
+﻿using System.Diagnostics;
+using System.Reflection.Metadata;
 
 static class Program
 {
-    static List<Utryckning> Nyutryckning =new();
-    static List<Personal> AllPolis=new();
-   
+    static List<Utryckning> NyUtryckning=new();
+    static List<Personal> Konstapel=new();
     static void Main (string[] args)
     {
-        AllPolis.Add(new Personal("Henrik Svensson",1634));
-        AllPolis.Add(new Personal("Adam Karlsson",1840));
-        AllPolis.Add(new Personal("Lena Svensson",1337));
-        AllPolis.Add(new Personal("Kurt Melander",1001));
-        Nyutryckning.Add(new Utryckning("Rån", "Hagaborgsgatan", new DateTime(2024,12,06,14,30,00),AllPolis.GetRange(0,2)));
-        Nyutryckning.Add(new Utryckning("Mord", "Jungfrugatan", new DateTime(2024,05,23,22,04,00),AllPolis.GetRange(1,3)));
-        Nyutryckning.Add(new Utryckning("Inbrott", "Alfabetsvägen", new DateTime(2023,08,16,01,34,00),AllPolis.GetRange(1,3)));
-        Nyutryckning.Add(new Utryckning("Krock", "Väg 27, Hagamotet", new DateTime(2023,10,09,17,54,00),AllPolis.GetRange(3,1)));
-        Nyutryckning.Add(new Utryckning("Rån", "Fabriksområde 2", new DateTime(2024,01,12,06,17,00),AllPolis.GetRange(0,2)));
+        Konstapel.Add(new Personal("Göran Eriksson", 1264));
+        Konstapel.Add(new Personal("Kalle Karlsson", 1265));
+        Konstapel.Add(new Personal("Sven Svensson", 1266));
+        Konstapel.Add(new Personal("Bengt Bengtsson", 1267));
+        NyUtryckning.Add(new Utryckning("Rån","Göteborg","Kungsgatan",DateTime.Parse("2021-10-10 12:00"),new List<Personal>{Konstapel[0],Konstapel[1]}));
+        NyUtryckning.Add(new Utryckning("Kollision","Göteborg","Kungsgatan",DateTime.Parse("2021-10-10 12:00"),new List<Personal>{Konstapel[0],Konstapel[1]}));
+        NyUtryckning.Add(new Utryckning("Rån","Växjö","Centrum",DateTime.Parse("2023-02-15 16:10"),new List<Personal>{Konstapel[0],Konstapel[3]}));
+        NyUtryckning.Add(new Utryckning("Mord","Stockholm","Drottninggatan",DateTime.Parse("2021-10-11 01:00"),new List<Personal>{Konstapel[2],Konstapel[3]}));
 
-       addUtryckning();
-       // PrintPersonal();
-        PrintRapport();
+        PrintMenu();
+    }
+    static void PrintMenu()
+    {
+        bool running=true;
+        while (running)
+        {
 
+            Console.WriteLine("=============Rapportsystem=============");
+            Console.Write("[1]Registrera Utryckning\n");
+            Console.Write("[2]Registrera Rapport\n");
+            Console.Write("[3]Lägg till Personal\n");
+            Console.Write("[4]Visa Personal\n");
+            Console.Write("[5]Sammanställning av rapport\n");
+            Console.Write("[6]Avsluta\n");
+            string input=Console.ReadLine();
+            switch(input)
+            {
+            case "1":
+                AddUtryckning();
+        // Console.Clear();
+            break;
+            case "2":
+                AddRapport();
+            break;
+            case "3":
+               AddPersonal();
+            break;
+            case "4":
+                PrintPersonal();
+            break;
+            case "5":
+                PrintRapport();
+            break;
+            case "6":
+                Environment.Exit(0);
+            break;
+            default:
+                Console.WriteLine("Fel inmatning");
+            break;
+            }
+        }
+    }
+    public static void AddUtryckning()
+    {
+            Console.Write("Skriv in Händelsetyp: ");
+            string händelsetyp=Console.ReadLine();
+            Console.Write("Skriv in Stad: ");
+            string stad=Console.ReadLine();
+            Console.Write("Skriv in Plats: ");
+            string plats=Console.ReadLine();
+            Console.Write("Skriv in Datum & Tid: ");
+            DateTime tidpunkt= DateTime.Parse(Console.ReadLine());
+            Console.WriteLine("Skriv in Polis på plats (ange Indexnr): ");
+            PrintPersonal();
+            Console.Write("Index: ");
+            int index=int.Parse(Console.ReadLine());
+            List<Personal>PolisPåplats=new();
+            //PolisPåplats.Add(Konstapel[index]);
+            NyUtryckning.Add(new Utryckning(händelsetyp,stad,plats,tidpunkt,PolisPåplats));
+            Console.Clear();
+            PrintMenu();       
+    }
+    public static void AddPersonal()
+    {
+        Console.Write("Skriv in För och efternamn: ");
+        string namn=Console.ReadLine();
+        Console.Write("Ange Tjänstenummer: ");
+        int tjänstNR=int.Parse(Console.ReadLine());
+        if(tjänstNR==tjänstNR)
+        {
+            Console.WriteLine("Tjänstenummer finns redan");
+        }
+        else
+        {
+        Konstapel.Add(new Personal(namn, tjänstNR));
+        }
+        Console.Clear();
+    }
+    public static void AddRapport()
+    {
+        Console.WriteLine("[1]Välj utryckning:");
+        PrintUtryckning();
+        int index=int.Parse(Console.ReadLine());
+        Console.Write("Skriv in en Beskrivning för utryckningen:");
+        string rapport = Console.ReadLine();
+        NyUtryckning[index].rapport=rapport;
+        Console.Clear();
+       
+    }
+    public static void PrintPersonal()
+    {
+        for(int i=0;i<Konstapel.Count;i++)
+        {
+            Console.WriteLine($"[{i}]Konstapel:{Konstapel[i].namn}||ID Nummer:{Konstapel[i].tjänstNR}");
+        }
         
+    }
+    public static void PrintUtryckning()
+    {
+        //foreach(var utryckning in NyUtryckning)
+        //{
+            Console.Clear();
+            for (int i=0;i<NyUtryckning.Count;i++)
+            {
+                Console.WriteLine($"{i}||{NyUtryckning[i].händelsetyp}||{NyUtryckning[i].stad}||{NyUtryckning[i].tidpunkt}||{NyUtryckning[i].rapport}");
+                for (int p=0;p<NyUtryckning[i].PolisPåplats.Count;p++)
+                {
+                    Console.WriteLine($"Polis på Plats\n||{NyUtryckning[i].PolisPåplats[p].namn}");
+                }
+            }
+        //}
     }
     public static void PrintRapport()
     {
-        foreach(var utryckning in Nyutryckning)
-        {
-            Console.WriteLine($"|Händelse:{utryckning.HändelseTyp}\t|Plats:{utryckning.plats}\t|Datum & Tid:{utryckning.tidPunkt}");
-            Console.WriteLine("Poliser på plats:");
-            foreach(var polis in utryckning.OnScene)
+        Console.Clear();
+        Console.WriteLine("================Rapporter================");
+        for (int i=0;i<NyUtryckning.Count;i++)
             {
-                Console.WriteLine($"|Namn:{polis.namn}\t|TjänsteNr:{polis.tjänsteNr}");
+                Console.WriteLine($"Den {NyUtryckning[i].tidpunkt} skedde det en utryckning för {NyUtryckning[i].händelsetyp} i {NyUtryckning[i].stad}\nBeskrivningen av händelsen:{NyUtryckning[i].rapport}");
+                Console.WriteLine($"Utryckande Personal från Station: {NyUtryckning[i].stad}");
+                Console.WriteLine("Polis som kom till platsen var");
+                for (int j=0;j<NyUtryckning[i].PolisPåplats.Count;j++)
+                {
+                    Console.WriteLine($"{NyUtryckning[i].PolisPåplats[j].namn}||{NyUtryckning[i].PolisPåplats[j].tjänstNR}");
+                }
             }
-            Console.WriteLine("________________________");
-            
-        }
+        Console.WriteLine("==============Rapporter Slut===============");
     }
-    public static void addUtryckning()
+    public class Utryckning
     {
-        Console.WriteLine("Skriv in Typen av Brott");
-        string typ=Console.ReadLine();
-        Console.WriteLine("Skriv in Platsen för händelsen");
-        string plats=Console.ReadLine();
-        Console.WriteLine("Skriv in datum & tid (YYYY-MM-DD HH:MM");
-        DateTime tid=DateTime.Parse(Console.ReadLine());
-        PrintPersonal();
-        Console.WriteLine("Välj polis som är på platsen");
-        int input=int.Parse(Console.ReadLine());
-        List<Personal> onScene=new();
-        onScene.Add(AllPolis[input]);
-        Console.WriteLine("Vill du lägga till fler poliser på platsen? (J/N)");
-        string svar=Console.ReadLine();
-        while(svar=="J")
-        {
-            PrintPersonal();
-            input=int.Parse(Console.ReadLine());
-            onScene.Add(AllPolis[input]);
-            Console.WriteLine("Vill du lägga till fler poliser på platsen? (J/N)");
-            svar=Console.ReadLine();
-        }
-        Nyutryckning.Add(new Utryckning(typ, plats,tid,onScene));
-        
-    }
-public static void PrintPersonal()
-{
-    for (int i=0; i<AllPolis.Count;i++)
-        {
-            Personal Polisen= AllPolis[i]; 
-            Console.WriteLine($"{i}: Konstapel:{Polisen.namn}||Tjänstenr:{Polisen.tjänsteNr}");
-        }
-        
-}
-}
-class Utryckning
-{
-    public string HändelseTyp;
-    public string plats;
-    public DateTime tidPunkt;
-    public List<Personal>OnScene;
+        public string händelsetyp;
+        public string stad;
+        public string plats;
+        public DateTime tidpunkt;
+        public string rapport;
+        public List<Personal>PolisPåplats;
 
-    public Utryckning(string händelseTyp, string plats, DateTime tidPunkt, List<Personal>onScene)
-    {
-        this.HändelseTyp=händelseTyp;
-        this.plats=plats;
-        this.tidPunkt=tidPunkt;
-        this.OnScene=onScene;
+        public Utryckning(string händelsetyp,string stad, string plats, DateTime tidpunkt,List<Personal>PolisPåplats)
+        {
+            this.händelsetyp=händelsetyp;
+            this.stad=stad;
+            this.plats=plats;
+            this.tidpunkt=tidpunkt;
+            this.PolisPåplats=PolisPåplats;
+
+        }
     }
-}
-class Personal
-{
-    public string namn;
-    public int tjänsteNr;
-    public Personal(string namn, int tjänsteNr)
+    public class Personal
     {
-        this.namn=namn;
-        this.tjänsteNr=tjänsteNr;
+        public string namn;
+        public int tjänstNR;
+
+        public Personal(string namn, int tjänstNR)
+        {
+            this.namn=namn;
+            this.tjänstNR=tjänstNR;
+        }
     }
 }
