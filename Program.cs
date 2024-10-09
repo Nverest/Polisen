@@ -60,16 +60,21 @@
     public static void AddUtryckning()
     {
         Console.Clear();
+
         Console.WriteLine("Lägg till ny Utryckning\n=======================");
         Console.Write("Skriv in Händelsetyp: ");
         string händelsetyp=Console.ReadLine();
+
         Console.Write("Skriv in Stad: ");
         string stad=Console.ReadLine();
+
         Console.Write("Skriv in Plats: ");
         string plats=Console.ReadLine();
+
         Console.Write("Skriv in Datum & Tid: ");
         //string input = Console.ReadLine();
         DateTime tidpunkt= DateTime.Parse(Console.ReadLine());
+
         Console.WriteLine("Hur många poliser var på plats?");
         int antal=int.Parse(Console.ReadLine());
         while(antal>Konstapel.Count)
@@ -82,21 +87,21 @@
             List<int> Antal=new();
             for(int i=0;i<antal;i++)
             {
-            Console.Write("Index: ");
-            int index=int.Parse(Console.ReadLine())-1;
-            while(Antal.Contains(index))
-            {
-                Console.WriteLine("Du har redan valt denna");
                 Console.Write("Index: ");
-                index=int.Parse(Console.ReadLine())-1;
-            }
-            
-            Antal.Add(index);
+                int index=int.Parse(Console.ReadLine())-1;
+                while(Antal.Contains(index))
+                {
+                    Console.WriteLine("Du har redan valt denna");
+                    Console.Write("Index: ");
+                    index=int.Parse(Console.ReadLine())-1;
+                }
+                
+                Antal.Add(index);
             }
             List<Personal>PolisPåplats=new();
             foreach(int index in Antal)
             {
-            PolisPåplats.Add(Konstapel[index]);
+                PolisPåplats.Add(Konstapel[index]);
             }
             NyUtryckning.Add(new Utryckning(händelsetyp,stad,plats,tidpunkt,PolisPåplats));
             Console.Clear();
@@ -192,8 +197,7 @@
                 Console.WriteLine("Polis som kom till platsen var följande:");
                 for (int j=0;j<NyUtryckning[i].PolisPåplats.Count;j++)
                 {
-                    Console.WriteLine($"{NyUtryckning[i].PolisPåplats[j].namn} || {NyUtryckning[i].PolisPåplats[j].tjänstNR}");
-                    
+                    Console.WriteLine($"{NyUtryckning[i].PolisPåplats[j].namn} || {NyUtryckning[i].PolisPåplats[j].tjänstNR}");    
                 }
             }
         Console.WriteLine("==============Rapporter Slut===============");
