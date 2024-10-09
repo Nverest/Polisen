@@ -1,10 +1,4 @@
-﻿using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
-using System.Reflection.Metadata;
-using System.Security.Cryptography;
-
-static class Program
+﻿static class Program
 {
     static List<Utryckning> NyUtryckning=new();
     static List<Personal> Konstapel=new();
@@ -21,6 +15,7 @@ static class Program
 
         PrintMenu();
     }
+    //Print metod för meny
     static void PrintMenu()
     {
         bool running=true;
@@ -64,53 +59,83 @@ static class Program
     }
     public static void AddUtryckning()
     {
-            Console.Write("Skriv in Händelsetyp: ");
-            string händelsetyp=Console.ReadLine();
-            Console.Write("Skriv in Stad: ");
-            string stad=Console.ReadLine();
-            Console.Write("Skriv in Plats: ");
-            string plats=Console.ReadLine();
-            Console.Write("Skriv in Datum & Tid: ");
-            DateTime tidpunkt= DateTime.Parse(Console.ReadLine());
-            Console.WriteLine("Skriv in Polis på plats (ange Indexnr): ");
+        Console.Clear();
+        Console.WriteLine("Lägg till ny Utryckning\n=======================");
+        Console.Write("Skriv in Händelsetyp: ");
+        string händelsetyp=Console.ReadLine();
+        Console.Write("Skriv in Stad: ");
+        string stad=Console.ReadLine();
+        Console.Write("Skriv in Plats: ");
+        string plats=Console.ReadLine();
+        Console.Write("Skriv in Datum & Tid: ");
+        //string input = Console.ReadLine();
+        DateTime tidpunkt= DateTime.Parse(Console.ReadLine());
+        Console.WriteLine("Hur många poliser var på plats?");
+        int antal=int.Parse(Console.ReadLine());
+        while(antal>Konstapel.Count)
+        {
+            Console.WriteLine("Det finns ej så många Poliser");
+            antal=int.Parse(Console.ReadLine());
+        }
             PrintPersonal();
+            Console.WriteLine("Skriv in Polis på plats (ange Indexnr): ");
+            List<int> Antal=new();
+            for(int i=0;i<antal;i++)
+            {
             Console.Write("Index: ");
-            int index=int.Parse(Console.ReadLine());
+            int index=int.Parse(Console.ReadLine())-1;
+            while(Antal.Contains(index))
+            {
+                Console.WriteLine("Du har redan valt denna");
+                Console.Write("Index: ");
+                index=int.Parse(Console.ReadLine())-1;
+            }
             
+            Antal.Add(index);
+            }
             List<Personal>PolisPåplats=new();
-            //PolisPåplats.Add(Konstapel[index]);
+            foreach(int index in Antal)
+            {
+            PolisPåplats.Add(Konstapel[index]);
+            }
             NyUtryckning.Add(new Utryckning(händelsetyp,stad,plats,tidpunkt,PolisPåplats));
             Console.Clear();
             Console.BackgroundColor= ConsoleColor.Green;
             Console.WriteLine("Ny Utryckning tillagd");
             Console.ResetColor();
             PrintMenu();       
+        
     }
+    //Metod för att lägga till personal
     public static void AddPersonal()
     {
+        Console.Clear();
         Console.Write("Skriv in För och efternamn: ");
         string namn=Console.ReadLine();
         
         Console.Write("Ange Tjänstenummer: ");
         int tjänstNR=int.Parse(Console.ReadLine());
-        if(Konstapel.Any(p => p.tjänstNR==tjänstNR))
+        while(Konstapel.Any(p => p.tjänstNR==tjänstNR))
         {
+            
             Console.BackgroundColor=ConsoleColor.Red;
             Console.WriteLine("Tjänstenummer finns redan");
             Console.ResetColor();
-            AddPersonal();
+            tjänstNR=int.Parse(Console.ReadLine());
+            
         }
-        else
-        {
+        
             Console.Clear();
             Konstapel.Add(new Personal(namn, tjänstNR));
             Console.BackgroundColor= ConsoleColor.Green;
             Console.WriteLine("Ny personal tillagd");
             Console.ResetColor();
-        }
+        
     }
+    //Metod för att lägga till Rapporten i utryckningen
     public static void AddRapport()
     {
+        Console.Clear();
         Console.WriteLine("[1]Välj utryckning:");
         PrintUtryckning();
         int index=int.Parse(Console.ReadLine());
@@ -123,14 +148,17 @@ static class Program
         Console.ResetColor();
        
     }
+    //Printmetod för personalen
     public static void PrintPersonal()
     {
+        Console.Clear();
         for(int i=0;i<Konstapel.Count;i++)
         {
-            Console.WriteLine($"[{i}]Konstapel:{Konstapel[i].namn}||ID Nummer:{Konstapel[i].tjänstNR}");
+            Console.WriteLine($"[{i+1}]Konstapel:{Konstapel[i].namn}||ID Nummer:{Konstapel[i].tjänstNR}");
         }
         
     }
+    //Printmetod för utryckning
     public static void PrintUtryckning()
     {
         //foreach(var utryckning in NyUtryckning)
@@ -150,53 +178,24 @@ static class Program
             }
         //}
     }
+    //Printmetod för rapporten med utryckning & station etc.
     public static void PrintRapport()
     {
         Console.Clear();
         Console.WriteLine("================Rapporter================");
         for (int i=0;i<NyUtryckning.Count;i++)
             {
-                Console.WriteLine("===================================");
+                Console.WriteLine("=======================================1");
                 Console.WriteLine($"Den {NyUtryckning[i].tidpunkt} skedde det en utryckning för {NyUtryckning[i].händelsetyp} i {NyUtryckning[i].stad}\nBeskrivningen av händelsen:{NyUtryckning[i].rapport}");
-                Console.WriteLine($"Utryckande Personal från Station: {NyUtryckning[i].stad}");
-                Console.WriteLine("|");
+                Console.WriteLine($"Utryckande Personal från Station: {NyUtryckning[i].stad}\t");
+                // Console.WriteLine("|");
                 Console.WriteLine("Polis som kom till platsen var följande:");
                 for (int j=0;j<NyUtryckning[i].PolisPåplats.Count;j++)
                 {
-                    Console.WriteLine($"{NyUtryckning[i].PolisPåplats[j].namn}||{NyUtryckning[i].PolisPåplats[j].tjänstNR}");
+                    Console.WriteLine($"{NyUtryckning[i].PolisPåplats[j].namn} || {NyUtryckning[i].PolisPåplats[j].tjänstNR}");
                     
                 }
             }
         Console.WriteLine("==============Rapporter Slut===============");
-    }
-}
-public class Utryckning
-{
-    public string händelsetyp;
-    public string stad;
-    public string plats;
-    public DateTime tidpunkt;
-    public string rapport;
-    public List<Personal>PolisPåplats;
-
-    public Utryckning(string händelsetyp,string stad, string plats, DateTime tidpunkt,List<Personal>PolisPåplats)
-    {
-        this.händelsetyp=händelsetyp;
-        this.stad=stad;
-        this.plats=plats;
-        this.tidpunkt=tidpunkt;
-        this.PolisPåplats=PolisPåplats;
-
-    }
-}
-public class Personal
-{
-    public string namn;
-    public int tjänstNR;
-
-    public Personal(string namn, int tjänstNR)
-    {
-        this.namn=namn;
-        this.tjänstNR=tjänstNR;
     }
 }
